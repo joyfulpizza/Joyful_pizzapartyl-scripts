@@ -1,0 +1,61 @@
+
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+local RunService = game:GetService("RunService")
+
+
+local Window = Rayfield:CreateWindow({
+    Name = "Cam",
+    LoadingTitle = "Camera Toggle",
+    LoadingSubtitle = "by Joyful_pizzapartyl",
+    ConfigurationSaving = { Enabled = false },
+    Discord = { Enabled = false }
+})
+
+local plr = game.Players.LocalPlayer
+local cameraLoop
+
+
+local FPTab = Window:CreateTab("FP")
+FPTab:CreateButton({
+    Name = "FirstPerson",
+    Callback = function()
+        if cameraLoop then cameraLoop:Disconnect() end
+
+        cameraLoop = RunService.RenderStepped:Connect(function()
+            if plr and plr.CameraMinZoomDistance and plr.CameraMaxZoomDistance then
+                plr.CameraMinZoomDistance = 0.5
+                plr.CameraMaxZoomDistance = 0.5
+            end
+        end)
+
+        Rayfield:Notify({
+            Title = "Camera",
+            Content = "First Person Forced!",
+            Duration = 2,
+            Image = 6023426915
+        })
+    end
+})
+
+
+local TPTab = Window:CreateTab("TP")
+TPTab:CreateButton({
+    Name = "ThirdPerson",
+    Callback = function()
+        if cameraLoop then cameraLoop:Disconnect() end
+
+        cameraLoop = RunService.RenderStepped:Connect(function()
+            if plr and plr.CameraMinZoomDistance and plr.CameraMaxZoomDistance then
+                plr.CameraMinZoomDistance = 12
+                plr.CameraMaxZoomDistance = 12
+            end
+        end)
+
+        Rayfield:Notify({
+            Title = "Camera",
+            Content = "Third Person Forced!",
+            Duration = 2,
+            Image = 6023426915
+        })
+    end
+})
