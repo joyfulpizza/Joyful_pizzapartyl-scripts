@@ -1,0 +1,124 @@
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+
+local LocalPlayer = Players.LocalPlayer
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "BreakingNewsUI"
+gui.ResetOnSpawn = false
+gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+local function typeText(label, fullText)
+	label.Text = ""
+	for i = 1, #fullText do
+		label.Text = string.sub(fullText, 1, i)
+		task.wait(0.02)
+	end
+end
+
+local function createBanner(player, message)
+
+	local frame = Instance.new("Frame")
+	frame.Size = UDim2.new(0.65,0,0,120)
+	frame.Position = UDim2.new(-0.7,0,0.08,0)
+	frame.BackgroundColor3 = Color3.fromRGB(180,0,0)
+	frame.BackgroundTransparency = 0.2
+	frame.BorderSizePixel = 0
+	frame.Parent = gui
+	
+	local stroke = Instance.new("UIStroke")
+	stroke.Thickness = 3
+	stroke.Transparency = 0.2
+	stroke.Color = Color3.fromRGB(255,255,255)
+	stroke.Parent = frame
+	
+	local topLine = Instance.new("Frame")
+	topLine.Size = UDim2.new(1,0,0,4)
+	topLine.BackgroundColor3 = Color3.fromRGB(255,255,255)
+	topLine.BorderSizePixel = 0
+	topLine.Parent = frame
+	
+	local title = Instance.new("TextLabel")
+	title.Size = UDim2.new(1,0,0,28)
+	title.Position = UDim2.new(0,0,0,8)
+	title.BackgroundTransparency = 1
+	title.Font = Enum.Font.GothamBlack
+	title.Text = "BREAKING NEWS!"
+	title.TextColor3 = Color3.fromRGB(255,255,0)
+	title.TextScaled = true
+	title.Parent = frame
+	
+	local avatar = Instance.new("ImageLabel")
+	avatar.Size = UDim2.new(0,60,0,60)
+	avatar.Position = UDim2.new(0,10,0.5,-10)
+	avatar.BackgroundTransparency = 1
+	avatar.Parent = frame
+	
+	local thumb = Players:GetUserThumbnailAsync(
+		player.UserId,
+		Enum.ThumbnailType.HeadShot,
+		Enum.ThumbnailSize.Size420x420
+	)
+	avatar.Image = thumb
+	
+	local msg = Instance.new("TextLabel")
+	msg.Size = UDim2.new(1,-80,0,40)
+	msg.Position = UDim2.new(0,75,0.5,-5)
+	msg.BackgroundTransparency = 1
+	msg.Font = Enum.Font.GothamBold
+	msg.TextColor3 = Color3.fromRGB(255,255,255)
+	msg.TextScaled = true
+	msg.TextXAlignment = Enum.TextXAlignment.Left
+	msg.Parent = frame
+	
+	local warning = Instance.new("TextLabel")
+	warning.Size = UDim2.new(1,0,0,22)
+	warning.Position = UDim2.new(0,0,1,-26)
+	warning.BackgroundTransparency = 1
+	warning.Font = Enum.Font.GothamBlack
+	warning.Text = "THIS IS VERY IMPORTANT NO FAKE"
+	warning.TextColor3 = Color3.fromRGB(255,255,255)
+	warning.TextScaled = true
+	warning.Parent = frame
+	
+	local bottomLine = Instance.new("Frame")
+	bottomLine.Size = UDim2.new(1,0,0,4)
+	bottomLine.Position = UDim2.new(0,0,1,-4)
+	bottomLine.BackgroundColor3 = Color3.fromRGB(255,255,255)
+	bottomLine.BorderSizePixel = 0
+	bottomLine.Parent = frame
+
+	local slideIn = TweenService:Create(
+		frame,
+		TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		{Position = UDim2.new(0.175,0,0.08,0)}
+	)
+	slideIn:Play()
+	slideIn.Completed:Wait()
+
+	typeText(msg, player.Name .. ": " .. message)
+
+	task.wait(2)
+
+	local slideOut = TweenService:Create(
+		frame,
+		TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+		{Position = UDim2.new(1.2,0,0.08,0)}
+	)
+	slideOut:Play()
+	slideOut.Completed:Wait()
+
+	frame:Destroy()
+end
+
+local function connect(player)
+	player.Chatted:Connect(function(msg)
+		createBanner(player,msg)
+	end)
+end
+
+for _,p in pairs(Players:GetPlayers()) do
+	connect(p)
+end
+
+Players.PlayerAdded:Connect(connect)
