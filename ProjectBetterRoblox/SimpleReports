@@ -1,0 +1,64 @@
+local Players = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
+
+local LocalPlayer = Players.LocalPlayer
+
+-- reasons, dont change or break.
+local reasonMap = {
+	exploiting = Enum.AbuseReportReason.Exploiting,
+	bullying = Enum.AbuseReportReason.Bullying,
+	scamming = Enum.AbuseReportReason.Scamming,
+	inappropriate = Enum.AbuseReportReason.InappropriateContent,
+	offsite = Enum.AbuseReportReason.OffsiteLinks,
+}
+
+local function notify(title, text, duration)
+	pcall(function()
+		StarterGui:SetCore("SendNotification", {
+			Title = title,
+			Text = text,
+			Duration = duration or 4
+		})
+	end)
+end
+
+local function handleChat(msg)
+	if string.sub(msg, 1, 7):lower() ~= "!report" then return end
+
+	local args = msg:split(" ")
+
+	-- format: !report player reason message
+	local targetName = args[2]
+	local reasonText = args[3] and args[3]:lower()
+
+	if not targetName or not reasonText then
+		notify("Report Failed", "Usage: !report (player) (reason) (message)")
+		return
+	end
+
+	local targetPlayer = Players:FindFirstChild(targetName)
+	if not targetPlayer then
+		notify("Report Failed", "Player not found: "..targetName)
+		return
+	end
+
+	local reasonEnum = reasonMap[reasonText]
+	if not reasonEnum then
+		notify(
+			"Invalid Reason",
+			"Use: exploiting, bullying, scamming, inappropriate, offsite"
+		)
+		return
+	end
+
+	local message = table.concat(args, " ", 4) or ""
+
+  Players:ReportAbuse(targetPlayer, reasonEnum, message)
+
+	notify(
+		"Report Submitted",
+		"Reported "..targetPlayer.Name.." for "..reasonText
+	)
+end
+
+LocalPlayer.Chatted:Connect(handleChat)
