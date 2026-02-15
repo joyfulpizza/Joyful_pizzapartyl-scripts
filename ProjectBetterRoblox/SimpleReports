@@ -1,3 +1,4 @@
+-- BROKEN, ROBLOX CHANGED ENUM.ABUSEREPORTREASON
 local Players = game:GetService("Players")
 local StarterGui = game:GetService("StarterGui")
 
