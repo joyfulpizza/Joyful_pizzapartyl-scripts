@@ -1,4 +1,6 @@
---// VoidLib v2
+--// VoidClassic+ Library
+--// classic simple, polished, with notifications & optional keysystem
+
 local VoidLib = {}
 
 function VoidLib:CreateWindow(settings)
@@ -8,205 +10,214 @@ function VoidLib:CreateWindow(settings)
     local loadingTitle = settings.LoadingTitle or "void"
     local loadingSubtitle = settings.LoadingSubtitle or "loading..."
 
-    local player = game.Players.LocalPlayer
+    local keySystemEnabled = settings.KeySystem or false
+    local correctKey = settings.Key or "void"
+    local keyTitle = settings.KeyTitle or "Key System"
+    local keySubtitle = settings.KeySubtitle or "enter key"
 
-    -- Loading screen
-    local loadGui = Instance.new("ScreenGui", player.PlayerGui)
+    local player = game.Players.LocalPlayer
+    local PlayerGui = player:WaitForChild("PlayerGui")
+
+    ----------------------------------------------------------------
+    -- LOADING SCREEN
+    ----------------------------------------------------------------
+    local loadGui = Instance.new("ScreenGui", PlayerGui)
     loadGui.Name = "VoidLoading"
 
     local loadFrame = Instance.new("Frame", loadGui)
     loadFrame.Size = UDim2.new(1,0,1,0)
     loadFrame.BackgroundColor3 = Color3.fromRGB(10,10,14)
 
-    local loadTitle = Instance.new("TextLabel", loadFrame)
-    loadTitle.Size = UDim2.new(1,0,0.5,0)
-    loadTitle.BackgroundTransparency = 1
-    loadTitle.Text = loadingTitle
-    loadTitle.TextColor3 = Color3.new(1,1,1)
-    loadTitle.Font = Enum.Font.GothamBold
-    loadTitle.TextSize = 26
+    local loadTitleLbl = Instance.new("TextLabel", loadFrame)
+    loadTitleLbl.Size = UDim2.new(1,0,0.5,0)
+    loadTitleLbl.BackgroundTransparency = 1
+    loadTitleLbl.Text = loadingTitle
+    loadTitleLbl.TextColor3 = Color3.new(1,1,1)
+    loadTitleLbl.Font = Enum.Font.GothamBold
+    loadTitleLbl.TextSize = 26
 
-    local loadSub = Instance.new("TextLabel", loadFrame)
-    loadSub.Size = UDim2.new(1,0,0.5,0)
-    loadSub.Position = UDim2.new(0,0,0.5,0)
-    loadSub.BackgroundTransparency = 1
-    loadSub.Text = loadingSubtitle
-    loadSub.TextColor3 = Color3.fromRGB(180,180,180)
-    loadSub.Font = Enum.Font.Gotham
-    loadSub.TextSize = 16
+    local loadSubLbl = Instance.new("TextLabel", loadFrame)
+    loadSubLbl.Size = UDim2.new(1,0,0.5,0)
+    loadSubLbl.Position = UDim2.new(0,0,0.5,0)
+    loadSubLbl.BackgroundTransparency = 1
+    loadSubLbl.Text = loadingSubtitle
+    loadSubLbl.TextColor3 = Color3.fromRGB(180,180,180)
+    loadSubLbl.Font = Enum.Font.Gotham
+    loadSubLbl.TextSize = 16
 
     task.wait(1.2)
     loadGui:Destroy()
 
-    -- Main GUI
-    local gui = Instance.new("ScreenGui", player.PlayerGui)
-    gui.Name = "VoidLib"
+    ----------------------------------------------------------------
+    -- KEY SYSTEM
+    ----------------------------------------------------------------
+    if keySystemEnabled then
+        local keyGui = Instance.new("ScreenGui", PlayerGui)
+
+        local frame = Instance.new("Frame", keyGui)
+        frame.Size = UDim2.new(0,300,0,170)
+        frame.Position = UDim2.new(0.5,-150,0.5,-85)
+        frame.BackgroundColor3 = Color3.fromRGB(18,18,24)
+        Instance.new("UICorner", frame)
+
+        local title = Instance.new("TextLabel", frame)
+        title.Size = UDim2.new(1,0,0,40)
+        title.BackgroundTransparency = 1
+        title.Text = keyTitle
+        title.TextColor3 = Color3.new(1,1,1)
+        title.Font = Enum.Font.GothamBold
+        title.TextSize = 18
+
+        local sub = Instance.new("TextLabel", frame)
+        sub.Size = UDim2.new(1,0,0,30)
+        sub.Position = UDim2.new(0,0,0,40)
+        sub.BackgroundTransparency = 1
+        sub.Text = keySubtitle
+        sub.TextColor3 = Color3.fromRGB(180,180,180)
+        sub.Font = Enum.Font.Gotham
+        sub.TextSize = 14
+
+        local box = Instance.new("TextBox", frame)
+        box.Size = UDim2.new(0.85,0,0,40)
+        box.Position = UDim2.new(0.075,0,0,80)
+        box.PlaceholderText = "Enter key..."
+        box.BackgroundColor3 = Color3.fromRGB(30,30,38)
+        box.TextColor3 = Color3.new(1,1,1)
+        box.Font = Enum.Font.Gotham
+        box.TextSize = 14
+        Instance.new("UICorner", box)
+
+        local btn = Instance.new("TextButton", frame)
+        btn.Size = UDim2.new(0.85,0,0,35)
+        btn.Position = UDim2.new(0.075,0,0,125)
+        btn.Text = "Submit"
+        btn.BackgroundColor3 = Color3.fromRGB(35,35,45)
+        btn.TextColor3 = Color3.new(1,1,1)
+        btn.Font = Enum.Font.Gotham
+        btn.TextSize = 14
+        Instance.new("UICorner", btn)
+
+        local unlocked = false
+
+        btn.MouseButton1Click:Connect(function()
+            if box.Text == correctKey then
+                unlocked = true
+                keyGui:Destroy()
+            else
+                box.Text = ""
+                box.PlaceholderText = "Wrong key"
+            end
+        end)
+
+        repeat task.wait() until unlocked
+    end
+
+    ----------------------------------------------------------------
+    -- MAIN GUI
+    ----------------------------------------------------------------
+    local gui = Instance.new("ScreenGui", PlayerGui)
+    gui.Name = "VoidClassic"
 
     local main = Instance.new("Frame", gui)
-    main.Size = UDim2.new(0,460,0,300)
+    main.Size = UDim2.new(0,460,0,320)
     main.Position = UDim2.new(0.3,0,0.3,0)
     main.BackgroundColor3 = Color3.fromRGB(18,18,24)
-    main.BorderSizePixel = 0
-    Instance.new("UICorner", main).CornerRadius = UDim.new(0,12)
+    Instance.new("UICorner", main)
 
     local title = Instance.new("TextLabel", main)
-    title.Text = titleText
     title.Size = UDim2.new(1,0,0,40)
     title.BackgroundTransparency = 1
+    title.Text = titleText
     title.TextColor3 = Color3.new(1,1,1)
     title.Font = Enum.Font.GothamBold
     title.TextSize = 18
 
-    -- Dragging
-    local dragging, dragStart, startPos
-    main.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStart = input.Position
-            startPos = main.Position
-        end
-    end)
+    ----------------------------------------------------------------
+    -- NOTIFICATION SYSTEM
+    ----------------------------------------------------------------
+    local notifHolder = Instance.new("Frame", gui)
+    notifHolder.Position = UDim2.new(1,-260,1,-20)
+    notifHolder.Size = UDim2.new(0,240,1,0)
+    notifHolder.BackgroundTransparency = 1
 
-    game:GetService("UserInputService").InputChanged:Connect(function(input)
-        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta = input.Position - dragStart
-            main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
-                                     startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        end
-    end)
+    function VoidLib:Notify(text, time)
+        time = time or 3
 
+        local notif = Instance.new("TextLabel", notifHolder)
+        notif.Size = UDim2.new(1,0,0,40)
+        notif.Position = UDim2.new(0,0,1,-60)
+        notif.BackgroundColor3 = Color3.fromRGB(25,25,32)
+        notif.TextColor3 = Color3.new(1,1,1)
+        notif.Font = Enum.Font.Gotham
+        notif.TextSize = 14
+        notif.Text = "  "..text
+        notif.TextXAlignment = Enum.TextXAlignment.Left
+        Instance.new("UICorner", notif)
+
+        notif:TweenPosition(UDim2.new(0,0,1,-110),"Out","Quad",0.25,true)
+
+        task.delay(time,function()
+            notif:TweenPosition(UDim2.new(0,0,1,-60),"Out","Quad",0.25,true)
+            task.wait(0.25)
+            notif:Destroy()
+        end)
+    end
+
+    ----------------------------------------------------------------
+    -- TAB SYSTEM + POLISHED LAYOUT
+    ----------------------------------------------------------------
     local tabHolder = Instance.new("Frame", main)
     tabHolder.Size = UDim2.new(0,120,1,-40)
     tabHolder.Position = UDim2.new(0,0,0,40)
     tabHolder.BackgroundTransparency = 1
 
-    local content = Instance.new("Frame", main)
+    local content = Instance.new("ScrollingFrame", main)
     content.Size = UDim2.new(1,-120,1,-40)
     content.Position = UDim2.new(0,120,0,40)
+    content.CanvasSize = UDim2.new(0,0,0,0)
+    content.ScrollBarThickness = 4
     content.BackgroundTransparency = 1
+
+    local layout = Instance.new("UIListLayout", content)
+    layout.Padding = UDim.new(0,8)
 
     local window = {}
 
     function window:CreateTab(name)
-        local tabBtn = Instance.new("TextButton", tabHolder)
-        tabBtn.Text = name
-        tabBtn.Size = UDim2.new(1,0,0,35)
-        tabBtn.BackgroundColor3 = Color3.fromRGB(28,28,34)
-        tabBtn.TextColor3 = Color3.new(1,1,1)
-        tabBtn.Font = Enum.Font.Gotham
-        tabBtn.TextSize = 14
-        Instance.new("UICorner", tabBtn).CornerRadius = UDim.new(0,8)
+        local btn = Instance.new("TextButton", tabHolder)
+        btn.Size = UDim2.new(1,0,0,35)
+        btn.Text = name
+        btn.BackgroundColor3 = Color3.fromRGB(28,28,34)
+        btn.TextColor3 = Color3.new(1,1,1)
+        btn.Font = Enum.Font.Gotham
+        btn.TextSize = 14
+        Instance.new("UICorner", btn)
 
-        local tabFrame = Instance.new("Frame", content)
-        tabFrame.Size = UDim2.new(1,0,1,0)
-        tabFrame.Visible = false
-        tabFrame.BackgroundTransparency = 1
-
-        tabBtn.MouseButton1Click:Connect(function()
-            for _,v in pairs(content:GetChildren()) do
-                if v:IsA("Frame") then v.Visible = false end
-            end
-            tabFrame.Visible = true
+        btn.MouseButton1Click:Connect(function()
+            content:ClearAllChildren()
+            layout.Parent = content
         end)
 
         local tab = {}
 
-        -- Text label
-        function tab:CreateText(text)
-            local lbl = Instance.new("TextLabel", tabFrame)
-            lbl.Size = UDim2.new(0.9,0,0,30)
-            lbl.Position = UDim2.new(0.05,0,0,0)
-            lbl.BackgroundTransparency = 1
-            lbl.Text = text
-            lbl.TextColor3 = Color3.new(1,1,1)
-            lbl.Font = Enum.Font.Gotham
-            lbl.TextSize = 14
-        end
-
-        -- Button
         function tab:CreateButton(text, callback)
-            local btn = Instance.new("TextButton", tabFrame)
-            btn.Size = UDim2.new(0.9,0,0,40)
-            btn.Position = UDim2.new(0.05,0,0,40)
-            btn.Text = text
-            btn.BackgroundColor3 = Color3.fromRGB(35,35,45)
-            btn.TextColor3 = Color3.new(1,1,1)
-            btn.Font = Enum.Font.Gotham
-            btn.TextSize = 14
-            Instance.new("UICorner", btn)
+            local b = Instance.new("TextButton", content)
+            b.Size = UDim2.new(1,-10,0,40)
+            b.Text = text
+            b.BackgroundColor3 = Color3.fromRGB(35,35,45)
+            b.TextColor3 = Color3.new(1,1,1)
+            b.Font = Enum.Font.Gotham
+            b.TextSize = 14
+            Instance.new("UICorner", b)
 
-            btn.MouseButton1Click:Connect(function()
+            b.MouseButton1Click:Connect(function()
                 if callback then callback() end
             end)
         end
 
-        -- Toggle
-        function tab:CreateToggle(text, callback)
-            local state = false
-            local toggle = Instance.new("TextButton", tabFrame)
-            toggle.Size = UDim2.new(0.9,0,0,40)
-            toggle.Position = UDim2.new(0.05,0,0,90)
-            toggle.Text = text.." : OFF"
-            toggle.BackgroundColor3 = Color3.fromRGB(35,35,45)
-            toggle.TextColor3 = Color3.new(1,1,1)
-            toggle.Font = Enum.Font.Gotham
-            toggle.TextSize = 14
-            Instance.new("UICorner", toggle)
-
-            toggle.MouseButton1Click:Connect(function()
-                state = not state
-                toggle.Text = text.." : "..(state and "ON" or "OFF")
-                if callback then callback(state) end
-            end)
-        end
-
-        -- Slider
-        function tab:CreateSlider(text, min, max, callback)
-            local slider = Instance.new("TextButton", tabFrame)
-            slider.Size = UDim2.new(0.9,0,0,40)
-            slider.Position = UDim2.new(0.05,0,0,140)
-            slider.Text = text.." : "..min
-            slider.BackgroundColor3 = Color3.fromRGB(35,35,45)
-            slider.TextColor3 = Color3.new(1,1,1)
-            slider.Font = Enum.Font.Gotham
-            slider.TextSize = 14
-            Instance.new("UICorner", slider)
-
-            local value = min
-            slider.MouseButton1Click:Connect(function()
-                value = value + 1
-                if value > max then value = min end
-                slider.Text = text.." : "..value
-                if callback then callback(value) end
-            end)
-        end
-
-        -- Dropdown list
-        function tab:CreateList(text, options, callback)
-            local list = Instance.new("TextButton", tabFrame)
-            list.Size = UDim2.new(0.9,0,0,40)
-            list.Position = UDim2.new(0.05,0,0,190)
-            list.Text = text
-            list.BackgroundColor3 = Color3.fromRGB(35,35,45)
-            list.TextColor3 = Color3.new(1,1,1)
-            list.Font = Enum.Font.Gotham
-            list.TextSize = 14
-            Instance.new("UICorner", list)
-
-            local index = 1
-            list.MouseButton1Click:Connect(function()
-                index = index + 1
-                if index > #options then index = 1 end
-                list.Text = text.." : "..options[index]
-                if callback then callback(options[index]) end
-            end)
-        end
-
-        -- Textbox
         function tab:CreateTextbox(text, callback)
-            local box = Instance.new("TextBox", tabFrame)
-            box.Size = UDim2.new(0.9,0,0,40)
-            box.Position = UDim2.new(0.05,0,0,240)
+            local box = Instance.new("TextBox", content)
+            box.Size = UDim2.new(1,-10,0,40)
             box.PlaceholderText = text
             box.BackgroundColor3 = Color3.fromRGB(35,35,45)
             box.TextColor3 = Color3.new(1,1,1)
@@ -217,6 +228,16 @@ function VoidLib:CreateWindow(settings)
             box.FocusLost:Connect(function()
                 if callback then callback(box.Text) end
             end)
+        end
+
+        function tab:CreateText(text)
+            local lbl = Instance.new("TextLabel", content)
+            lbl.Size = UDim2.new(1,-10,0,30)
+            lbl.BackgroundTransparency = 1
+            lbl.Text = text
+            lbl.TextColor3 = Color3.new(1,1,1)
+            lbl.Font = Enum.Font.Gotham
+            lbl.TextSize = 14
         end
 
         return tab
