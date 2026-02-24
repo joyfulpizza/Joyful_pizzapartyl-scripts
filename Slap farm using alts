@@ -1,0 +1,56 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+
+local player = Players.LocalPlayer
+
+local teleportConnection = nil
+local clickThread = nil
+local clicking = false
+
+local function stopAll()
+	if teleportConnection then
+		teleportConnection:Disconnect()
+		teleportConnection = nil
+	end
+	
+	clicking = false
+end
+
+local function startMode(offset)
+	stopAll()
+	
+	teleportConnection = RunService.Heartbeat:Connect(function()
+		local character = player.Character
+		if not character then return end
+		
+		local hrp = character:FindFirstChild("HumanoidRootPart")
+		if not hrp then return end
+		
+		hrp.CFrame = CFrame.new(-offset, 100, 0)
+	end)
+	
+
+	clicking = true
+	clickThread = task.spawn(function()
+		while clicking do
+			VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+			VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+			task.wait(1)
+		end
+	end)
+end
+
+player.Chatted:Connect(function(message)
+	message = message:lower()
+
+	if message == "/e get help" then
+		startMode(1000000000000)
+
+	elseif message == "/e help" then
+		startMode(1000000000002)
+
+	elseif message == "/e stop" then
+		stopAll()
+	end
+end)
